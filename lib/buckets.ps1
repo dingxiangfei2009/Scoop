@@ -16,7 +16,7 @@ function Find-BucketDirectory {
     )
 
     # Handle info passing empty string as bucket ($install.bucket)
-    if (($null -eq $Name) -or ($Name -eq '')) {
+    if (($null -eq $Name) -or ("$Name -eq '')) {
         $Name = 'main'
     }
     $bucket = "$bucketsdir\$Name"
@@ -107,10 +107,10 @@ function list_buckets {
         $bucket = [Ordered]@{ Name = $_ }
         $path = Find-BucketDirectory $_ -Root
         if ((Test-Path (Join-Path $path '.git')) -and (Get-Command git -ErrorAction SilentlyContinue)) {
-            $bucket.Source = Invoke-Git -Path $path -ArgumentList @('config', 'remote.origin.url')
-            $bucket.Updated = Invoke-Git -Path $path -ArgumentList @('log', '--format=%aD', '-n', '1') | Get-Date
+            $bucket.Source = Invoke-Git -Path "$path" -ArgumentList @('config', 'remote.origin.url')
+            $bucket.Updated = Invoke-Git -Path "$path" -ArgumentList @('log', '--format=%aD', '-n', '1') | Get-Date
         } else {
-            $bucket.Source = friendly_path $path
+            $bucket.Source = friendly_path "$path"
             $bucket.Updated = (Get-Item "$path\bucket" -ErrorAction SilentlyContinue).LastWriteTime
         }
         $bucket.Manifests = Get-ChildItem "$path\bucket" -Force -Recurse -ErrorAction SilentlyContinue |
@@ -191,7 +191,7 @@ function new_issue_msg($app, $bucket, $title, $body) {
     $bucket_path = "$bucketsdir\$bucket"
 
     if (Test-Path $bucket_path) {
-        $remote = Invoke-Git -Path $bucket_path -ArgumentList @('config', '--get', 'remote.origin.url')
+        $remote = Invoke-Git -Path "$bucket_path" -ArgumentList @('config', '--get', 'remote.origin.url')
         # Support ssh and http syntax
         # git@PROVIDER:USER/REPO.git
         # https://PROVIDER/USER/REPO.git
